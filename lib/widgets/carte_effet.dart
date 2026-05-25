@@ -65,6 +65,18 @@ class _CarteEffetState extends State<CarteEffet> {
     return c.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase();
   }
 
+  static const _couleursDefaut = [
+    Color(0xFFFF0000), // Rouge
+    Color(0xFFFF5500), // Orange
+    Color(0xFFFFFF00), // Jaune
+    Color(0xFF00FF00), // Vert
+    Color(0xFF00FFFF), // Cyan
+    Color(0xFF0055FF), // Bleu
+    Color(0xFFBF00FF), // Violet
+    Color(0xFFFF00FF), // Magenta
+    Color(0xFFFFFFFF), // Blanc
+  ];
+
   Future<void> _ouvrirColorPicker() async {
     final couleurInitiale = widget.effet.couleur != null
         ? _couleurDepuisHex(widget.effet.couleur!)
@@ -87,13 +99,43 @@ class _CarteEffetState extends State<CarteEffet> {
           ),
           content: SizedBox(
             width: 280,
-            child: HueRingPicker(
-              pickerColor: selection,
-              onColorChanged: (c) {
-                setDialogState(() => selection = c);
-              },
-              enableAlpha: false,
-              displayThumbColor: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                HueRingPicker(
+                  pickerColor: selection,
+                  onColorChanged: (c) => setDialogState(() => selection = c),
+                  enableAlpha: false,
+                  displayThumbColor: true,
+                ),
+                const SizedBox(height: 12),
+                // Pastilles de couleurs prédéfinies
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: _couleursDefaut.map((couleur) {
+                    final selectionne = selection.value == couleur.value;
+                    return GestureDetector(
+                      onTap: () => setDialogState(() => selection = couleur),
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: couleur,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selectionne
+                                ? Colors.white
+                                : Colors.white24,
+                            width: selectionne ? 2.5 : 1,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
           ),
           actions: [
